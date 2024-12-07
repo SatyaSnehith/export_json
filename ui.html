@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Export Design to JSON</h2>
+    <button id="export">Export</button>
+    <button id="close">Close</button>
+    <script>
+      const exportButton = document.getElementById("export");
+      const closeButton = document.getElementById("close");
+
+      exportButton.onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "export-json" } }, "*");
+      };
+
+      closeButton.onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+      };
+
+      window.onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        if (msg.type === "exported") {
+          const data = JSON.stringify(msg.layers, null, 2);
+          const blob = new Blob([data], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "design-layers.json";
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      };
+    </script>
+  </body>
+</html>
